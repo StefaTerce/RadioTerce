@@ -7,13 +7,10 @@
       <v-layout>
 
         <v-app-bar color="#7fffd4">
-          <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
-          <v-toolbar-title>My Music</v-toolbar-title>
+          <v-toolbar-title>Radio Terce</v-toolbar-title>
 
           <v-spacer></v-spacer>
-
-          <v-btn icon="mdi-magnify"></v-btn>
         </v-app-bar>
 
         <v-main>
