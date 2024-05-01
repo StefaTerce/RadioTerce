@@ -12,7 +12,9 @@
                       <v-card-title class="text-h5">{{ radio.name }}</v-card-title>
                       <v-card-subtitle>{{ radio.artist }}</v-card-subtitle>
                       <v-card-actions>
-                        <v-btn class="ms-2" icon="mdi-play" variant="text" @click="playAudio(radio.url)"></v-btn>
+                        <v-btn class="ms-2" icon :color="radio.isPlaying ? 'red' : ''" :ripple="false" @click="togglePlayback(radio)">
+                          <v-icon>{{ radio.isPlaying ? 'mdi-pause' : 'mdi-play' }}</v-icon>
+                        </v-btn>
                       </v-card-actions>
                     </div>
                     <v-avatar class="ma-3" rounded="0" size="125">
@@ -52,7 +54,8 @@ export default {
             imageUrl: radio.favicon || null,
             color: '#952175',
             url: radio.url, // URL dell'audio
-            stationId: radio.stationuuid // Aggiungi l'id della stazione
+            stationId: radio.stationuuid, // Aggiungi l'id della stazione
+            isPlaying: false // Aggiungi la proprietà per il controllo della riproduzione
           }));
           console.log(this.radios);
         });
@@ -64,6 +67,15 @@ export default {
       this.audio.src = url;
       // Avvia la riproduzione dell'audio
       this.audio.play();
+    },
+    togglePlayback(radio) {
+      if (radio.isPlaying) {
+        this.audio.pause(); // Pausa l'audio
+      } else {
+        this.audio.src = radio.url; // Imposta l'URL dell'audio
+        this.audio.play(); // Avvia la riproduzione dell'audio
+      }
+      radio.isPlaying = !radio.isPlaying; // Inverti lo stato di riproduzione
     }
   },
   created() {
@@ -71,8 +83,3 @@ export default {
   },
 }
 </script>
-<style>
-.top-padding {
-  padding-top: 100px; /* Spazio dal top */
-}
-</style>
