@@ -29,6 +29,7 @@
                           class="ms-2"
                           icon="mdi-play"
                           variant="text"
+                          @click="playAudio(radio.url)"
                         ></v-btn>
                       </v-card-actions>
                     </div>
@@ -37,7 +38,8 @@
                       rounded="0"
                       size="125"
                     >
-                      <v-img :src="radio.imageUrl"></v-img>
+                      <v-img v-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
+                      <v-icon v-else>mdi-radio</v-icon>
                     </v-avatar>
                   </div>
                 </v-card>
@@ -56,6 +58,7 @@ export default {
   data() {
     return {
       radios: [],
+      audio: new Audio() // Elemento audio per la riproduzione
     }
   },
   methods: {
@@ -63,15 +66,25 @@ export default {
       fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
         .then(response => response.json())
         .then(data => {
+          console.log(data)
           this.radios = data.map(radio => ({
             name: radio.name,
             artist: radio.artist,
-            imageUrl: radio.imageUrl,
-            color: '#952175' // Imposta il colore della card come preferisci
+            imageUrl: radio.favicon || null,
+            color: '#952175',
+            url: radio.url // URL dell'audio
           }));
           console.log(this.radios);
         });
     },
+    playAudio(url) {
+      // Pausa l'audio attualmente in riproduzione (se presente)
+      this.audio.pause();
+      // Imposta l'URL dell'audio
+      this.audio.src = url;
+      // Avvia la riproduzione dell'audio
+      this.audio.play();
+    }
   },
   created() {
     this.getRadios();
