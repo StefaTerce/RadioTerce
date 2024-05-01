@@ -1,18 +1,7 @@
 <template>
-  <v-container>
-    <v-card
-      class="mx-auto"
-      max-width="1200"
-    >
+  <v-container class="mt-10">
+    <v-card class="mx-auto" max-width="1200">
       <v-layout>
-
-        <v-app-bar color="#7fffd4">
-
-          <v-toolbar-title>Radio Terce</v-toolbar-title>
-
-          <v-spacer></v-spacer>
-        </v-app-bar>
-
         <v-main>
           <v-container class="containerCards">
             <v-row dense>
@@ -20,24 +9,13 @@
                 <v-card :color="radio.color">
                   <div class="d-flex flex-no-wrap justify-space-between">
                     <div>
-                      <v-card-title class="text-h5">
-                        {{ radio.name }}
-                      </v-card-title>
+                      <v-card-title class="text-h5">{{ radio.name }}</v-card-title>
                       <v-card-subtitle>{{ radio.artist }}</v-card-subtitle>
                       <v-card-actions>
-                        <v-btn
-                          class="ms-2"
-                          icon="mdi-play"
-                          variant="text"
-                          @click="playAudio(radio.url)"
-                        ></v-btn>
+                        <v-btn class="ms-2" icon="mdi-play" variant="text" @click="playAudio(radio.url)"></v-btn>
                       </v-card-actions>
                     </div>
-                    <v-avatar
-                      class="ma-3"
-                      rounded="0"
-                      size="125"
-                    >
+                    <v-avatar class="ma-3" rounded="0" size="125">
                       <v-img v-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
                       <v-icon v-else>mdi-radio</v-icon>
                     </v-avatar>
@@ -51,6 +29,7 @@
     </v-card>
   </v-container>
 </template>
+
 
 <script>
 export default {
@@ -72,7 +51,8 @@ export default {
             artist: radio.artist,
             imageUrl: radio.favicon || null,
             color: '#952175',
-            url: radio.url // URL dell'audio
+            url: radio.url, // URL dell'audio
+            stationId: radio.stationuuid // Aggiungi l'id della stazione
           }));
           console.log(this.radios);
         });
@@ -91,3 +71,8 @@ export default {
   },
 }
 </script>
+<style>
+.top-padding {
+  padding-top: 100px; /* Spazio dal top */
+}
+</style>
