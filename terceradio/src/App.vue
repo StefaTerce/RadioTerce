@@ -15,7 +15,7 @@
 
     <v-app-bar app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>My App</v-toolbar-title>
+      <v-toolbar-title>Terce Radio</v-toolbar-title>
     </v-app-bar>
 
     <v-content>
