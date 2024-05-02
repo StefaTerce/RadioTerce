@@ -53,22 +53,31 @@ export default {
       return colors[randomIndex]; // Restituisce il colore corrispondente all'indice casuale
     },
     getRadios() {
-      fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
-        .then(response => response.json())
-        .then(data => {
-          console.log(data);
-          this.radios = data.map(radio => ({
-            name: radio.name,
-            artist: radio.artist,
-            imageUrl: radio.favicon || null,
-            color: this.randomColor(), // Genera un colore casuale
-            url: radio.url, // URL dell'audio
-            stationId: radio.stationuuid, // Aggiungi l'id della stazione
-            isPlaying: false, // Aggiungi la proprietà per il controllo della riproduzione
-            isFavorite: false // Aggiungi la proprietà per indicare se la radio è preferita o meno
-          }));
-          console.log(this.radios);
-        });
+      // Recupera i dati salvati dal localStorage
+      const storedRadios = localStorage.getItem('radios');
+      // Se ci sono dati salvati nel localStorage, assegna i dati a radios
+      if (storedRadios) {
+        console.log("radio prese dal api");
+        this.radios = JSON.parse(storedRadios);
+      } else {
+        // Altrimenti, ottieni i dati dall'API
+        fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            this.radios = data.map(radio => ({
+              name: radio.name,
+              artist: radio.artist,
+              imageUrl: radio.favicon || null,
+              color: this.randomColor(), // Genera un colore casuale
+              url: radio.url, // URL dell'audio
+              stationId: radio.stationuuid, // Aggiungi l'id della stazione
+              isPlaying: false, // Aggiungi la proprietà per il controllo della riproduzione
+              isFavorite: false // Aggiungi la proprietà per indicare se la radio è preferita o meno
+            }));
+            console.log(this.radios);
+          });
+      }
     },
     playAudio(url, radio) {
       // Pausa l'audio attualmente in riproduzione (se presente)
