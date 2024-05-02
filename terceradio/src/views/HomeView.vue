@@ -95,6 +95,12 @@ export default {
     toggleFavorite(radio) {
       // Inverti lo stato di preferenza della radio
       radio.isFavorite = !radio.isFavorite;
+      // Salva i dati aggiornati nel local storage
+      this.saveToLocalStorage();
+    },
+    saveToLocalStorage() {
+      // Converti l'array di radio in formato JSON e salvalo nel local storage
+      localStorage.setItem('radios', JSON.stringify(this.radios));
     }
   },
   created() {
