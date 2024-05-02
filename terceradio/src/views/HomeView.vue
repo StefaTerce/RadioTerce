@@ -32,15 +32,15 @@
   </v-container>
 </template>
 
-
 <script>
 export default {
   name: 'HomeView',
   data() {
     return {
       radios: [],
-      audio: new Audio() // Elemento audio per la riproduzione
-    }
+      audio: new Audio(), // Elemento audio per la riproduzione
+      currentPlayingRadio: null // Memorizza l'ID della radio attualmente in riproduzione
+    };
   },
   methods: {
     randomColor() {
@@ -52,7 +52,7 @@ export default {
       fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
         .then(response => response.json())
         .then(data => {
-          console.log(data)
+          console.log(data);
           this.radios = data.map(radio => ({
             name: radio.name,
             artist: radio.artist,
@@ -65,27 +65,31 @@ export default {
           console.log(this.radios);
         });
     },
-    playAudio(url) {
+    playAudio(url, radio) {
       // Pausa l'audio attualmente in riproduzione (se presente)
-      this.audio.pause();
+      if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
+        this.currentPlayingRadio.isPlaying = false; // Ferma la riproduzione della radio attualmente in riproduzione
+        this.audio.pause();
+      }
       // Imposta l'URL dell'audio
       this.audio.src = url;
       // Avvia la riproduzione dell'audio
       this.audio.play();
+      // Memorizza l'ID della radio attualmente in riproduzione
+      this.currentPlayingRadio = radio;
     },
     togglePlayback(radio) {
       if (radio.isPlaying) {
         this.audio.pause(); // Pausa l'audio
       } else {
-        this.audio.src = radio.url; // Imposta l'URL dell'audio
-        this.audio.play(); // Avvia la riproduzione dell'audio
+        this.playAudio(radio.url, radio); // Avvia la riproduzione dell'audio per questa radio
       }
-      radio.isPlaying = !radio.isPlaying; // Inverti lo stato di riproduzione
+      // Inverti lo stato di riproduzione
+      radio.isPlaying = !radio.isPlaying;
     }
   },
   created() {
     this.getRadios();
-  },
-}
+  }
+};
 </script>
-
