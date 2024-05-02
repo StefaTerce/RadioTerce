@@ -1,6 +1,6 @@
 <template>
   <v-container class="mt-10">
-    <v-card class="mx-auto" max-width="1200">
+    <v-card class="mx-auto" max-width="1500">
       <v-layout>
         <v-main>
           <v-container class="containerCards">
@@ -15,10 +15,14 @@
                         <v-btn class="ms-2" icon :color="radio.isPlaying ? 'red' : ''" :ripple="false" @click="togglePlayback(radio)">
                           <v-icon>{{ radio.isPlaying ? 'mdi-pause' : 'mdi-play' }}</v-icon>
                         </v-btn>
+                        <!-- Aggiungi il tasto preferito -->
+                        <v-btn class="ms-2" icon @click="toggleFavorite(radio)">
+                          <v-icon :color="radio.isFavorite ? 'yellow darken-2' : ''">mdi-star</v-icon>
+                        </v-btn>
                       </v-card-actions>
                     </div>
                     <v-avatar class="ma-3" rounded="0" size="125">
-                      <v-img v-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
+                      <v-img width="100" height="120" v-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
                       <v-icon v-else>mdi-radio</v-icon>
                     </v-avatar>
                   </div>
@@ -60,7 +64,8 @@ export default {
             color: this.randomColor(), // Genera un colore casuale
             url: radio.url, // URL dell'audio
             stationId: radio.stationuuid, // Aggiungi l'id della stazione
-            isPlaying: false // Aggiungi la proprietà per il controllo della riproduzione
+            isPlaying: false, // Aggiungi la proprietà per il controllo della riproduzione
+            isFavorite: false // Aggiungi la proprietà per indicare se la radio è preferita o meno
           }));
           console.log(this.radios);
         });
@@ -86,6 +91,10 @@ export default {
       }
       // Inverti lo stato di riproduzione
       radio.isPlaying = !radio.isPlaying;
+    },
+    toggleFavorite(radio) {
+      // Inverti lo stato di preferenza della radio
+      radio.isFavorite = !radio.isFavorite;
     }
   },
   created() {
