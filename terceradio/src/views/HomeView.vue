@@ -6,7 +6,7 @@
           <v-container class="containerCards">
             <v-row dense>
               <v-col cols="12" md="4" v-for="(radio, index) in radios" :key="index">
-                <v-card :color="radio.color">
+                <v-card :color="randomColor()">
                   <div class="d-flex flex-no-wrap justify-space-between">
                     <div>
                       <v-card-title class="text-h5">{{ radio.name }}</v-card-title>
@@ -43,6 +43,11 @@ export default {
     }
   },
   methods: {
+    randomColor() {
+      const colors = ['#952175', '#00796b', '#1976d2', '#c62828']; // Array di colori
+      const randomIndex = Math.floor(Math.random() * colors.length); // Seleziona un indice casuale nell'array
+      return colors[randomIndex]; // Restituisce il colore corrispondente all'indice casuale
+    },
     getRadios() {
       fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
         .then(response => response.json())
@@ -52,7 +57,7 @@ export default {
             name: radio.name,
             artist: radio.artist,
             imageUrl: radio.favicon || null,
-            color: '#952175',
+            color: this.randomColor(), // Genera un colore casuale
             url: radio.url, // URL dell'audio
             stationId: radio.stationuuid, // Aggiungi l'id della stazione
             isPlaying: false // Aggiungi la proprietà per il controllo della riproduzione
@@ -83,3 +88,4 @@ export default {
   },
 }
 </script>
+
