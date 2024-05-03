@@ -9,20 +9,21 @@
                 <v-card :color="randomColor()">
                   <div class="d-flex flex-no-wrap justify-space-between">
                     <div>
-                      <v-card-title class="text-h5">{{ radio.name }}</v-card-title>
-                      <v-card-subtitle>{{ radio.artist }}</v-card-subtitle>
+                      <!-- Aggiornamento delle classi di dimensioni del testo qui -->
+                      <v-card-title class="text-subtitle-2">{{ radio.name }}</v-card-title>
+                      <v-card-subtitle class="text-caption">{{ radio.artist }}</v-card-subtitle>
                       <v-card-actions>
                         <v-btn class="ms-2" icon :color="radio.isPlaying ? 'red' : ''" :ripple="false" @click="togglePlayback(radio)">
                           <v-icon>{{ radio.isPlaying ? 'mdi-pause' : 'mdi-play' }}</v-icon>
                         </v-btn>
-                        <!-- Aggiungi il tasto preferito -->
                         <v-btn class="ms-2" icon @click="toggleFavorite(radio)">
                           <v-icon :color="radio.isFavorite ? 'yellow darken-2' : ''">mdi-star</v-icon>
                         </v-btn>
                       </v-card-actions>
                     </div>
                     <v-avatar class="ma-3" rounded="0" size="125">
-                      <v-img width="100" height="120" v-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
+                      <v-img v-if="radio.isPlaying" :src="require('@/assets/audio-8777_256.gif')"></v-img>
+                      <v-img width="100" height="120" v-else-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
                       <v-icon v-else>mdi-radio</v-icon>
                     </v-avatar>
                   </div>
@@ -35,6 +36,8 @@
     </v-card>
   </v-container>
 </template>
+
+
 
 <script>
 export default {
@@ -117,3 +120,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+.text-small {
+  font-size: 0.875rem; /* Regola questa dimensione come preferisci */
+}
+</style>
