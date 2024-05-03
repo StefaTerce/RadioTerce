@@ -9,7 +9,6 @@
                 <v-card :color="randomColor()">
                   <div class="d-flex flex-no-wrap justify-space-between">
                     <div>
-                      <!-- Aggiornamento delle classi di dimensioni del testo qui -->
                       <v-card-title class="text-subtitle-2">{{ radio.name }}</v-card-title>
                       <v-card-subtitle class="text-caption">{{ radio.artist }}</v-card-subtitle>
                       <v-card-actions>
@@ -22,9 +21,18 @@
                       </v-card-actions>
                     </div>
                     <v-avatar class="ma-3" rounded="0" size="125">
-                      <v-img v-if="radio.isPlaying" :src="require('@/assets/audio-8777_256.gif')"></v-img>
-                      <v-img width="100" height="120" v-else-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
+                      <v-img width="100" height="120" v-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
                       <v-icon v-else>mdi-radio</v-icon>
+                    <!-- Template -->
+                    <VideoPlayer
+                      v-if="radio.url.endsWith('.m3u8') && radio.isPlaying"
+                      ref="hlsPlayer"
+                      :link="radio.url"
+                      :isMuted="true"
+                      :isControls="true"
+                      class="video-hls"
+                    />
+
                     </v-avatar>
                   </div>
                 </v-card>
@@ -38,80 +46,93 @@
 </template>
 
 
-
 <script>
+import { VideoPlayer } from 'vue-hls-video-player';
+
 export default {
   name: 'HomeView',
+  components: {
+    VideoPlayer
+  },
   data() {
     return {
       radios: [],
-      audio: new Audio(), // Elemento audio per la riproduzione
-      currentPlayingRadio: null // Memorizza l'ID della radio attualmente in riproduzione
+      audio: new Audio(),
+      currentPlayingRadio: null,
     };
   },
   methods: {
     randomColor() {
-      const colors = ['#952175', '#00796b', '#1976d2', '#c62828']; // Array di colori
-      const randomIndex = Math.floor(Math.random() * colors.length); // Seleziona un indice casuale nell'array
-      return colors[randomIndex]; // Restituisce il colore corrispondente all'indice casuale
+      const colors = ['#952175', '#00796b', '#1976d2', '#c62828'];
+      const randomIndex = Math.floor(Math.random() * colors.length);
+      return colors[randomIndex];
     },
     getRadios() {
-      // Recupera i dati salvati dal localStorage
       const storedRadios = localStorage.getItem('radios');
-      // Se ci sono dati salvati nel localStorage, assegna i dati a radios
       if (storedRadios) {
-        console.log("radio prese dal api");
         this.radios = JSON.parse(storedRadios);
       } else {
-        // Altrimenti, ottieni i dati dall'API
         fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
           .then(response => response.json())
           .then(data => {
-            console.log(data);
             this.radios = data.map(radio => ({
               name: radio.name,
               artist: radio.artist,
               imageUrl: radio.favicon || null,
-              color: this.randomColor(), // Genera un colore casuale
-              url: radio.url, // URL dell'audio
-              stationId: radio.stationuuid, // Aggiungi l'id della stazione
-              isPlaying: false, // Aggiungi la proprietà per il controllo della riproduzione
-              isFavorite: false // Aggiungi la proprietà per indicare se la radio è preferita o meno
+              color: this.randomColor(),
+              url: radio.url,
+              stationId: radio.stationuuid,
+              isPlaying: false,
+              isFavorite: false
             }));
-            console.log(this.radios);
+            this.$nextTick(() => {
+              this.radios.forEach(radio => {
+                if (radio.url.endsWith('.m3u8')) {
+                  // Pre-initialize or check player readiness here if needed
+                }
+              });
+            });
           });
       }
     },
     playAudio(url, radio) {
-      // Pausa l'audio attualmente in riproduzione (se presente)
-      if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
-        this.currentPlayingRadio.isPlaying = false; // Ferma la riproduzione della radio attualmente in riproduzione
-        this.audio.pause();
+      if (url.endsWith('.m3u8')) {
+        this.$nextTick(() => {
+          if (this.$refs.hlsPlayer) {
+            this.$refs.hlsPlayer.link = url;
+            this.$refs.hlsPlayer.play();
+          } else {
+            console.error("HLS Player not available or not properly initialized.");
+          }
+        });
+      } else {
+        if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
+          this.currentPlayingRadio.isPlaying = false;
+          this.audio.pause();
+        }
+        this.audio.src = url;
+        this.audio.play();
+        this.currentPlayingRadio = radio;
       }
-      // Imposta l'URL dell'audio
-      this.audio.src = url;
-      // Avvia la riproduzione dell'audio
-      this.audio.play();
-      // Memorizza l'ID della radio attualmente in riproduzione
-      this.currentPlayingRadio = radio;
+      radio.isPlaying = true;
     },
     togglePlayback(radio) {
       if (radio.isPlaying) {
-        this.audio.pause(); // Pausa l'audio
+        if (radio.url.endsWith('.m3u8') && this.$refs.hlsPlayer) {
+          this.$refs.hlsPlayer.pause();
+        } else {
+          this.audio.pause();
+        }
+        radio.isPlaying = false;
       } else {
-        this.playAudio(radio.url, radio); // Avvia la riproduzione dell'audio per questa radio
+        this.playAudio(radio.url, radio);
       }
-      // Inverti lo stato di riproduzione
-      radio.isPlaying = !radio.isPlaying;
     },
     toggleFavorite(radio) {
-      // Inverti lo stato di preferenza della radio
       radio.isFavorite = !radio.isFavorite;
-      // Salva i dati aggiornati nel local storage
       this.saveToLocalStorage();
     },
     saveToLocalStorage() {
-      // Converti l'array di radio in formato JSON e salvalo nel local storage
       localStorage.setItem('radios', JSON.stringify(this.radios));
     }
   },
@@ -120,6 +141,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .text-small {
   font-size: 0.875rem; /* Regola questa dimensione come preferisci */
