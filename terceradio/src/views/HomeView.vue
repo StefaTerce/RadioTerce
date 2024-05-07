@@ -7,25 +7,24 @@
             <v-row dense>
               <v-col cols="12" md="4" v-for="(radio, index) in radios" :key="index">
                 <v-card :color="randomColor()">
-                  <div class="d-flex flex-no-wrap justify-space-between">
-                    <div>
-                      <!-- Aggiornamento delle classi di dimensioni del testo qui -->
-                      <v-card-title class="text-subtitle-2">{{ radio.name }}</v-card-title>
-                      <v-card-subtitle class="text-caption">{{ radio.artist }}</v-card-subtitle>
-                      <v-card-actions>
-                        <v-btn class="ms-2" icon :color="radio.isPlaying ? 'red' : ''" :ripple="false" @click="togglePlayback(radio)">
-                          <v-icon>{{ radio.isPlaying ? 'mdi-pause' : 'mdi-play' }}</v-icon>
-                        </v-btn>
-                        <v-btn class="ms-2" icon @click="toggleFavorite(radio)">
-                          <v-icon :color="radio.isFavorite ? 'yellow darken-2' : ''">mdi-star</v-icon>
-                        </v-btn>
-                      </v-card-actions>
-                    </div>
+                  <div class="d-flex flex-column align-center justify-center">
                     <v-avatar class="ma-3" rounded="0" size="125">
                       <v-img v-if="radio.isPlaying" :src="require('@/assets/audio-8777_256.gif')"></v-img>
                       <v-img width="100" height="120" v-else-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
                       <v-icon v-else>mdi-radio</v-icon>
                     </v-avatar>
+                    <div class="text-center">
+                      <v-card-title class="text-subtitle-2">{{ radio.name }}</v-card-title>
+                      <v-card-subtitle class="text-caption">{{ radio.artist }}</v-card-subtitle>
+                    </div>
+                    <v-card-actions class="justify-center">
+                      <v-btn class="ms-2" icon :color="radio.isPlaying ? 'red' : ''" @click="togglePlayback(radio)">
+                        <v-icon>{{ radio.isPlaying ? 'mdi-pause' : 'mdi-play' }}</v-icon>
+                      </v-btn>
+                      <v-btn class="ms-2" icon @click="toggleFavorite(radio)">
+                        <v-icon :color="radio.isFavorite ? 'yellow darken-2' : ''">mdi-star</v-icon>
+                      </v-btn>
+                    </v-card-actions>
                   </div>
                 </v-card>
               </v-col>
@@ -36,8 +35,6 @@
     </v-card>
   </v-container>
 </template>
-
-
 
 <script>
 import Hls from 'hls.js';
@@ -141,7 +138,11 @@ export default {
 </script>
 
 <style scoped>
-.text-small {
-  font-size: 0.875rem; /* Regola questa dimensione come preferisci */
+.ma-3 {
+  margin-top: 10px; /* Increase top margin if necessary for better visual separation */
+}
+.text-center {
+  text-align: center; /* Ensures the text is centered below the image */
 }
 </style>
+
