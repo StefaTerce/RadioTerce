@@ -66,6 +66,7 @@ export default {
         fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
           .then(response => response.json())
           .then(data => {
+            console.log(data);
             this.radios = data.map(radio => ({
               name: radio.name,
               artist: radio.artist,
@@ -76,6 +77,7 @@ export default {
               isPlaying: false,
               isFavorite: false
             }));
+            console.log(this.radios);
           });
       }
     },
