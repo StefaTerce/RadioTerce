@@ -31,7 +31,8 @@ export default {
       drawer: true,
       items: [
         { text: 'Home', icon: 'mdi-home', route: '/' },
-        { text: 'Favourites', icon: 'mdi-star', route: '/favourites' }
+        { text: 'Favourites', icon: 'mdi-star', route: '/favourites' },
+        { text: 'World', icon: 'mdi-star', route: '/world' },
       ]
     }
   },
