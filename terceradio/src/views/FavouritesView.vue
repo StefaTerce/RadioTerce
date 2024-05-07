@@ -39,14 +39,17 @@
 
 
 <script>
+import Hls from 'hls.js';
+
 export default {
   name: 'HomeView',
   data() {
     return {
       radios: [],
-      FavouriteRadios: [], // Aggiungi qui l'array per le radio preferite
-      audio: new Audio(),
-      currentPlayingRadio: null
+      FavouriteRadios: [], // Array per le radio preferite
+      audio: new Audio(), // Elemento audio per la riproduzione
+      currentPlayingRadio: null, // Memorizza l'ID della radio attualmente in riproduzione
+      hls: null // Instance di HLS.js
     };
   },
   methods: {
@@ -56,24 +59,46 @@ export default {
       return colors[randomIndex];
     },
     getRadios() {
-      // Recupera i dati dal localStorage
       const storedRadios = JSON.parse(localStorage.getItem('radios')) || [];
-      this.radios = storedRadios; // Salva tutte le radio in 'radios'
-      // Filtra le radio preferite e salva in 'FavouriteRadios'
-      this.FavouriteRadios = storedRadios.filter(radio => radio.isFavorite);
+      this.radios = storedRadios.map(radio => ({ ...radio, isPlaying: false })); // Imposta isPlaying a false per tutte le radio
+      this.FavouriteRadios = this.radios.filter(radio => radio.isFavorite);
     },
     playAudio(url, radio) {
       if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
         this.currentPlayingRadio.isPlaying = false;
+        if (this.hls) {
+          this.hls.destroy();
+          this.hls = null;
+        }
         this.audio.pause();
       }
-      this.audio.src = url;
-      this.audio.play();
+
+      if (url.endsWith('.m3u8')) {
+        if (Hls.isSupported()) {
+          this.hls = new Hls();
+          this.hls.loadSource(url);
+          this.hls.attachMedia(this.audio);
+          this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            this.audio.play();
+          });
+        } else if (this.audio.canPlayType('application/vnd.apple.mpegurl')) {
+          this.audio.src = url;
+          this.audio.play();
+        }
+      } else {
+        this.audio.src = url;
+        this.audio.play();
+      }
+
       this.currentPlayingRadio = radio;
+      radio.isPlaying = true;
     },
     togglePlayback(radio) {
       if (radio.isPlaying) {
         this.audio.pause();
+        if (this.hls) {
+          this.hls.stopLoad();
+        }
       } else {
         this.playAudio(radio.url, radio);
       }
@@ -81,6 +106,7 @@ export default {
     },
     toggleFavorite(radio) {
       radio.isFavorite = !radio.isFavorite;
+      this.FavouriteRadios = this.radios.filter(r => r.isFavorite); // Aggiorna l'array delle radio preferite
       this.saveToLocalStorage();
     },
     saveToLocalStorage() {
