@@ -124,8 +124,13 @@ export default {
       this.saveToLocalStorage();
     },
     saveToLocalStorage() {
-      localStorage.setItem('radios', JSON.stringify(this.radios));
-    }
+    // Mappa tutte le radio impostando isPlaying a false prima di salvarle
+    const radiosToSave = this.radios.map(radio => ({
+      ...radio,
+      isPlaying: false // Assicura che isPlaying sia sempre false quando salvi nel localStorage
+    }));
+    localStorage.setItem('radios', JSON.stringify(radiosToSave));
+  }
   },
   created() {
     this.getRadios();

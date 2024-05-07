@@ -60,8 +60,8 @@ export default {
     },
     getRadios() {
       const storedRadios = JSON.parse(localStorage.getItem('radios')) || [];
-      this.radios = storedRadios.map(radio => ({ ...radio, isPlaying: false })); // Imposta isPlaying a false per tutte le radio
-      this.FavouriteRadios = this.radios.filter(radio => radio.isFavorite);
+      this.radios = storedRadios;
+      this.FavouriteRadios = storedRadios.filter(radio => radio.isFavorite);
     },
     playAudio(url, radio) {
       if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
@@ -91,7 +91,6 @@ export default {
       }
 
       this.currentPlayingRadio = radio;
-      radio.isPlaying = true;
     },
     togglePlayback(radio) {
       if (radio.isPlaying) {
@@ -110,15 +109,19 @@ export default {
       this.saveToLocalStorage();
     },
     saveToLocalStorage() {
-      localStorage.setItem('radios', JSON.stringify(this.radios));
-    }
+    // Mappa tutte le radio impostando isPlaying a false prima di salvarle
+    const radiosToSave = this.radios.map(radio => ({
+      ...radio,
+      isPlaying: false // Assicura che isPlaying sia sempre false quando salvi nel localStorage
+    }));
+    localStorage.setItem('radios', JSON.stringify(radiosToSave));
+  }
   },
   created() {
     this.getRadios();
   }
 };
 </script>
-
 
 <style scoped>
 .text-small {
