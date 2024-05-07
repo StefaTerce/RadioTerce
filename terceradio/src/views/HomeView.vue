@@ -40,78 +40,90 @@
 
 
 <script>
+import Hls from 'hls.js';
+
 export default {
   name: 'HomeView',
   data() {
     return {
       radios: [],
       audio: new Audio(), // Elemento audio per la riproduzione
-      currentPlayingRadio: null // Memorizza l'ID della radio attualmente in riproduzione
+      currentPlayingRadio: null, // Memorizza l'ID della radio attualmente in riproduzione
+      hls: null // Instance di HLS.js
     };
   },
   methods: {
     randomColor() {
-      const colors = ['#952175', '#00796b', '#1976d2', '#c62828']; // Array di colori
-      const randomIndex = Math.floor(Math.random() * colors.length); // Seleziona un indice casuale nell'array
-      return colors[randomIndex]; // Restituisce il colore corrispondente all'indice casuale
+      const colors = ['#952175', '#00796b', '#1976d2', '#c62828'];
+      const randomIndex = Math.floor(Math.random() * colors.length);
+      return colors[randomIndex];
     },
     getRadios() {
-      // Recupera i dati salvati dal localStorage
       const storedRadios = localStorage.getItem('radios');
-      // Se ci sono dati salvati nel localStorage, assegna i dati a radios
       if (storedRadios) {
-        console.log("radio prese dal api");
         this.radios = JSON.parse(storedRadios);
       } else {
-        // Altrimenti, ottieni i dati dall'API
         fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
           .then(response => response.json())
           .then(data => {
-            console.log(data);
             this.radios = data.map(radio => ({
               name: radio.name,
               artist: radio.artist,
               imageUrl: radio.favicon || null,
-              color: this.randomColor(), // Genera un colore casuale
-              url: radio.url, // URL dell'audio
-              stationId: radio.stationuuid, // Aggiungi l'id della stazione
-              isPlaying: false, // Aggiungi la proprietà per il controllo della riproduzione
-              isFavorite: false // Aggiungi la proprietà per indicare se la radio è preferita o meno
+              color: this.randomColor(),
+              url: radio.url,
+              stationId: radio.stationuuid,
+              isPlaying: false,
+              isFavorite: false
             }));
-            console.log(this.radios);
           });
       }
     },
     playAudio(url, radio) {
-      // Pausa l'audio attualmente in riproduzione (se presente)
       if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
-        this.currentPlayingRadio.isPlaying = false; // Ferma la riproduzione della radio attualmente in riproduzione
+        this.currentPlayingRadio.isPlaying = false;
+        if (this.hls) {
+          this.hls.destroy();
+          this.hls = null;
+        }
         this.audio.pause();
       }
-      // Imposta l'URL dell'audio
-      this.audio.src = url;
-      // Avvia la riproduzione dell'audio
-      this.audio.play();
-      // Memorizza l'ID della radio attualmente in riproduzione
+
+      if (url.endsWith('.m3u8')) {
+        if (Hls.isSupported()) {
+          this.hls = new Hls();
+          this.hls.loadSource(url);
+          this.hls.attachMedia(this.audio);
+          this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            this.audio.play();
+          });
+        } else if (this.audio.canPlayType('application/vnd.apple.mpegurl')) {
+          this.audio.src = url;
+          this.audio.play();
+        }
+      } else {
+        this.audio.src = url;
+        this.audio.play();
+      }
+
       this.currentPlayingRadio = radio;
     },
     togglePlayback(radio) {
       if (radio.isPlaying) {
-        this.audio.pause(); // Pausa l'audio
+        this.audio.pause();
+        if (this.hls) {
+          this.hls.stopLoad();
+        }
       } else {
-        this.playAudio(radio.url, radio); // Avvia la riproduzione dell'audio per questa radio
+        this.playAudio(radio.url, radio);
       }
-      // Inverti lo stato di riproduzione
       radio.isPlaying = !radio.isPlaying;
     },
     toggleFavorite(radio) {
-      // Inverti lo stato di preferenza della radio
       radio.isFavorite = !radio.isFavorite;
-      // Salva i dati aggiornati nel local storage
       this.saveToLocalStorage();
     },
     saveToLocalStorage() {
-      // Converti l'array di radio in formato JSON e salvalo nel local storage
       localStorage.setItem('radios', JSON.stringify(this.radios));
     }
   },
@@ -120,6 +132,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .text-small {
   font-size: 0.875rem; /* Regola questa dimensione come preferisci */
