@@ -3,6 +3,17 @@
     <v-card class="mx-auto" max-width="1500">
       <v-layout>
         <v-main>
+          <v-col cols="12" md="4" class="text-center mt-10">
+            <v-select
+              v-model="selectedTags"
+              :items="allTags"
+              label="Seleziona tag"
+              multiple
+              chips
+              dense
+            ></v-select>
+          </v-col>
+
           <v-container class="containerCards">
             <v-row dense>
               <v-col cols="12" md="4" v-for="(radio, index) in radios" :key="index">
@@ -46,7 +57,8 @@ export default {
       radios: [],
       audio: new Audio(), // Elemento audio per la riproduzione
       currentPlayingRadio: null, // Memorizza l'ID della radio attualmente in riproduzione
-      hls: null // Instance di HLS.js
+      hls: null, // Instance di HLS.js
+      allTags: [],
     };
   },
   methods: {
@@ -55,7 +67,29 @@ export default {
       const randomIndex = Math.floor(Math.random() * colors.length);
       return colors[randomIndex];
     },
-    getRadios() {
+    creaTag() {
+    // Itera su tutte le radio nel vettore
+    this.radios.forEach(radio => {
+      // Controlla se ci sono tag e aggiungili a allTags
+      if (radio.tags) {
+        // Separa i tag se ci sono spazi o virgole
+        const tagsArray = radio.tags.split(/[,\s]+/);
+        // Aggiungi ogni tag separato a allTags
+        tagsArray.forEach(tag => {
+          // Assicura che il tag non sia vuoto prima di aggiungerlo
+          if (tag.trim() !== '') {
+            this.allTags.push(tag.trim());
+          }
+        });
+      }
+    });
+
+    // Rimuove duplicati e ordina i tag in ordine alfabetico
+    const uniqueSortedTags = [...new Set(this.allTags)].sort();
+    
+    console.log(uniqueSortedTags);
+  },
+    getRadios() { 
       const storedRadios = localStorage.getItem('radios');
       if (storedRadios) {
         this.radios = JSON.parse(storedRadios);
@@ -72,11 +106,13 @@ export default {
               url: radio.url,
               stationId: radio.stationuuid,
               isPlaying: false,
-              isFavorite: false
+              isFavorite: false,
+              tags: radio.tags
             }));
             console.log(this.radios);
           });
       }
+      this.creaTag()
     },
     playAudio(url, radio) {
       if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
@@ -133,7 +169,7 @@ export default {
   },
   created() {
     this.getRadios();
-  }
+  },
 };
 </script>
 
