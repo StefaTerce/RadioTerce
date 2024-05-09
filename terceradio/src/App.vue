@@ -32,7 +32,7 @@ export default {
       items: [
         { text: 'Home', icon: 'mdi-home', route: '/' },
         { text: 'Favourites', icon: 'mdi-star', route: '/favourites' },
-        { text: 'World', icon: 'mdi-star', route: '/world' },
+        { text: 'World', icon: 'mdi-earth', route: '/world' },
       ]
     }
   },
