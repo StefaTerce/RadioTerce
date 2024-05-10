@@ -16,7 +16,7 @@
 
           <v-container class="containerCards">
             <v-row dense>
-              <v-col cols="12" md="4" v-for="(radio, index) in radios" :key="index">
+              <v-col cols="12" md="4" v-for="(radio, index) in filteredRadios" :key="index">
                 <v-card :color="randomColor()">
                   <div class="d-flex flex-column align-center justify-center">
                     <v-avatar class="ma-3" rounded="0" size="125">
@@ -47,6 +47,7 @@
   </v-container>
 </template>
 
+
 <script>
 import Hls from 'hls.js';
 
@@ -55,41 +56,39 @@ export default {
   data() {
     return {
       radios: [],
-      audio: new Audio(), // Elemento audio per la riproduzione
-      currentPlayingRadio: null, // Memorizza l'ID della radio attualmente in riproduzione
-      hls: null, // Instance di HLS.js
+      audio: new Audio(),
+      currentPlayingRadio: null,
+      hls: null,
       allTags: [],
+      selectedTags: []
     };
+  },
+  computed: {
+    filteredRadios() {
+      if (this.selectedTags.length === 0) {
+        return this.radios;
+      }
+      return this.radios.filter(radio => {
+        const radioTags = radio.tags ? radio.tags.split(/[,\s]+/).map(tag => tag.trim()) : [];
+        return this.selectedTags.some(tag => radioTags.includes(tag));
+      });
+    }
   },
   methods: {
     randomColor() {
       const colors = ['#952175', '#00796b', '#1976d2', '#c62828'];
-      const randomIndex = Math.floor(Math.random() * colors.length);
-      return colors[randomIndex];
+      return colors[Math.floor(Math.random() * colors.length)];
     },
     creaTag() {
-    // Itera su tutte le radio nel vettore
-    this.radios.forEach(radio => {
-      // Controlla se ci sono tag e aggiungili a allTags
-      if (radio.tags) {
-        // Separa i tag se ci sono spazi o virgole
-        const tagsArray = radio.tags.split(/[,\s]+/);
-        // Aggiungi ogni tag separato a allTags
-        tagsArray.forEach(tag => {
-          // Assicura che il tag non sia vuoto prima di aggiungerlo
-          if (tag.trim() !== '') {
-            this.allTags.push(tag.trim());
-          }
-        });
-      }
-    });
-
-    // Rimuove duplicati e ordina i tag in ordine alfabetico
-    const uniqueSortedTags = [...new Set(this.allTags)].sort();
-    
-    console.log(uniqueSortedTags);
-  },
-    getRadios() { 
+      this.radios.forEach(radio => {
+        if (radio.tags) {
+          const tagsArray = radio.tags.split(/[,\s]+/).map(tag => tag.trim());
+          this.allTags.push(...tagsArray);
+        }
+      });
+      this.allTags = [...new Set(this.allTags)].sort();
+    },
+    getRadios() {
       const storedRadios = localStorage.getItem('radios');
       if (storedRadios) {
         this.radios = JSON.parse(storedRadios);
@@ -97,33 +96,29 @@ export default {
         fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
           .then(response => response.json())
           .then(data => {
-            console.log(data);
             this.radios = data.map(radio => ({
               name: radio.name,
               artist: radio.artist,
               imageUrl: radio.favicon || null,
-              color: this.randomColor(),
+              tags: radio.tags,
               url: radio.url,
               stationId: radio.stationuuid,
               isPlaying: false,
-              isFavorite: false,
-              tags: radio.tags
+              isFavorite: false
             }));
-            console.log(this.radios);
+            this.creaTag();
           });
       }
-      this.creaTag()
     },
     playAudio(url, radio) {
       if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
         this.currentPlayingRadio.isPlaying = false;
+        this.audio.pause();
         if (this.hls) {
           this.hls.destroy();
           this.hls = null;
         }
-        this.audio.pause();
       }
-
       if (url.endsWith('.m3u8')) {
         if (Hls.isSupported()) {
           this.hls = new Hls();
@@ -140,7 +135,7 @@ export default {
         this.audio.src = url;
         this.audio.play();
       }
-
+      radio.isPlaying = true;
       this.currentPlayingRadio = radio;
     },
     togglePlayback(radio) {
@@ -149,27 +144,23 @@ export default {
         if (this.hls) {
           this.hls.stopLoad();
         }
+        radio.isPlaying = false;
       } else {
         this.playAudio(radio.url, radio);
       }
-      radio.isPlaying = !radio.isPlaying;
     },
     toggleFavorite(radio) {
       radio.isFavorite = !radio.isFavorite;
       this.saveToLocalStorage();
     },
     saveToLocalStorage() {
-    // Mappa tutte le radio impostando isPlaying a false prima di salvarle
-    const radiosToSave = this.radios.map(radio => ({
-      ...radio,
-      isPlaying: false // Assicura che isPlaying sia sempre false quando salvi nel localStorage
-    }));
-    localStorage.setItem('radios', JSON.stringify(radiosToSave));
-  }
+      const radiosToSave = this.radios.map(radio => ({ ...radio, isPlaying: false }));
+      localStorage.setItem('radios', JSON.stringify(radiosToSave));
+    }
   },
   created() {
     this.getRadios();
-  },
+  }
 };
 </script>
 
@@ -181,4 +172,3 @@ export default {
   text-align: center; /* Ensures the text is centered below the image */
 }
 </style>
-
