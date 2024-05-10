@@ -1,6 +1,6 @@
 <template>
   <v-container class="mt-10">
-    <v-card class="mx-auto" max-width="1500">
+    <v-card class="mx-auto" max-width="2000">
       <v-layout>
         <v-main>
           <v-col cols="12" md="4" class="text-center mt-10">
@@ -17,7 +17,7 @@
           <v-container class="containerCards">
             <v-row dense>
               <v-col cols="12" md="4" v-for="(radio, index) in filteredRadios" :key="index">
-                <v-card :color="randomColor()">
+                <v-card :color="randomColor()" style="height: 370px;">
                   <div class="d-flex flex-column align-center justify-center">
                     <v-avatar class="ma-3" rounded="0" size="125">
                       <v-img v-if="radio.isPlaying" :src="require('@/assets/audio-8777_256.gif')"></v-img>
@@ -27,6 +27,17 @@
                     <div class="text-center">
                       <v-card-title class="text-subtitle-2">{{ radio.name }}</v-card-title>
                       <v-card-subtitle class="text-caption">{{ radio.artist }}</v-card-subtitle>
+                      <!-- Tags displayed as chips -->
+                      <v-row class="mt-2">
+                        <v-chip
+                          v-for="tag in radio.tags.split(/[,\s]+/).filter(tag => tag.trim() !== '')"
+                          :key="tag"
+                          class="ma-1"
+                          small
+                        >
+                          {{ tag }}
+                        </v-chip>
+                      </v-row>
                     </div>
                     <v-card-actions class="justify-center">
                       <v-btn class="ms-2" icon :color="radio.isPlaying ? 'red' : ''" @click="togglePlayback(radio)">
@@ -46,6 +57,7 @@
     </v-card>
   </v-container>
 </template>
+
 
 
 <script>
@@ -166,9 +178,14 @@ export default {
 
 <style scoped>
 .ma-3 {
-  margin-top: 10px; /* Increase top margin if necessary for better visual separation */
+  margin-top: 10px;
 }
+
 .text-center {
-  text-align: center; /* Ensures the text is centered below the image */
+  text-align: center;
 }
+
+
+
+
 </style>
