@@ -118,9 +118,9 @@ export default {
               isPlaying: false,
               isFavorite: false
             }));
-            this.creaTag();
           });
       }
+      this.creaTag();
     },
     playAudio(url, radio) {
       if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
@@ -184,8 +184,4 @@ export default {
 .text-center {
   text-align: center;
 }
-
-
-
-
 </style>
