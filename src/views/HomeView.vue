@@ -20,13 +20,10 @@
                 <v-card :color="randomColor()" style="height: 370px;">
                   <div class="d-flex flex-column align-center justify-center">
                     <v-avatar class="ma-3" rounded="0" size="125">
-                    <a :href="radio.websiteUrl" target="_blank"> <!-- Add this line -->
                       <v-img v-if="radio.isPlaying" :src="require('@/assets/audio-8777_256.gif')"></v-img>
-                      <v-img width="130" height="120" v-else-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
+                      <v-img width="100" height="120" v-else-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
                       <v-icon v-else>mdi-radio</v-icon>
-                    </a> <!-- Close the anchor tag here -->
-                  </v-avatar>
-
+                    </v-avatar>
                     <div class="text-center">
                       <v-card-title class="text-subtitle-2">{{ radio.name }}</v-card-title>
                       <v-card-subtitle class="text-caption">{{ radio.artist }}</v-card-subtitle>
@@ -104,29 +101,27 @@ export default {
       this.allTags = [...new Set(this.allTags)].sort();
     },
     getRadios() {
-  const storedRadios = localStorage.getItem('radios');
-  if (storedRadios) {
-    this.radios = JSON.parse(storedRadios);
-    this.creaTag();
-  } else {
-    fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
-      .then(response => response.json())
-      .then(data => {
-        this.radios = data.map(radio => ({
-          name: radio.name,
-          artist: radio.artist,
-          imageUrl: radio.favicon || null,
-          tags: radio.tags,
-          url: radio.url, // Existing audio stream URL
-          websiteUrl: radio.homepage, // Add this line if the API provides a homepage URL
-          stationId: radio.stationuuid,
-          isPlaying: false,
-          isFavorite: false
-        }));
+      const storedRadios = localStorage.getItem('radios');
+      if (storedRadios) {
+        this.radios = JSON.parse(storedRadios);
         this.creaTag();
-      });
-  }
-},
+      } else {
+        fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
+          .then(response => response.json())
+          .then(data => {
+            this.radios = data.map(radio => ({
+              name: radio.name,
+              artist: radio.artist,
+              imageUrl: radio.favicon || null,
+              tags: radio.tags,
+              url: radio.url,
+              stationId: radio.stationuuid,
+              isPlaying: false,
+              isFavorite: false
+            }));
+            this.creaTag(); });
+      }
+    },
     playAudio(url, radio) {
       if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
         this.currentPlayingRadio.isPlaying = false;
