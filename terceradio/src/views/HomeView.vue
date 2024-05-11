@@ -104,6 +104,7 @@ export default {
       const storedRadios = localStorage.getItem('radios');
       if (storedRadios) {
         this.radios = JSON.parse(storedRadios);
+        this.creaTag();
       } else {
         fetch('https://nl1.api.radio-browser.info/json/stations/search?limit=100&countrycode=IT&hidebroken=true&order=clickcount&reverse=true')
           .then(response => response.json())
@@ -118,9 +119,8 @@ export default {
               isPlaying: false,
               isFavorite: false
             }));
-          });
+            this.creaTag(); });
       }
-      this.creaTag();
     },
     playAudio(url, radio) {
       if (this.currentPlayingRadio && this.currentPlayingRadio !== radio) {
