@@ -15,3 +15,6 @@ Hls.js: Libreria per la riproduzione di flussi HLS (HTTP Live Streaming).
 API Radio-Browser: API per ottenere dati sulle stazioni radio da tutto il mondo.
 
 ![Screenshot dell'applicazione](AppScreenshots/screen1.png)
+![Screenshot dell'applicazione](AppScreenshots/screen2.png)
+![Screenshot dell'applicazione](AppScreenshots/screen3.png)
+![Screenshot dell'applicazione sul telefono](AppScreenshots/mobile.png)
