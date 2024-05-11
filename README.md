@@ -14,4 +14,4 @@ Three.js: Libreria JavaScript per la creazione di grafica 3D interattiva.
 Hls.js: Libreria per la riproduzione di flussi HLS (HTTP Live Streaming).
 API Radio-Browser: API per ottenere dati sulle stazioni radio da tutto il mondo.
 
-![Screenshot dell'applicazione](AppScreenshot/screen1.png)
+![Screenshot dell'applicazione](AppScreenshots/screen1.png)
