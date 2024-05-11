@@ -65,24 +65,39 @@
       };
     },
     mounted() {
-      this.init();
-      this.animate();
-  
-      this.renderer.domElement.addEventListener('click', this.onMarkerClick, false);
-  
-      // Fetch radio stations data for the whole world
-      this.fetchRadioStations('https://nl1.api.radio-browser.info/json/stations/search?limit=100&hidebroken=true&order=clickcount&reverse=true&haslocation=true');
-  
-      // Fetch radio stations data for Italy
-      this.fetchRadioStations('https://nl1.api.radio-browser.info/json/stations/search?limit=200&hidebroken=true&order=clickcount&reverse=true&country=Italy');
-  
-      window.addEventListener('resize', this.handleWindowResize);
-  
-      // Initialize the video player
-      this.videoPlayer = document.createElement('video');
-      this.videoPlayer.style.display = 'none'; // Hide the video player
-      document.body.appendChild(this.videoPlayer); // Append the video player to the body
-    },
+  this.init();
+  this.animate();
+
+  this.renderer.domElement.addEventListener('click', this.onMarkerClick, false);
+
+  // Fetch radio stations data for Russia
+  this.fetchRadioStations('https://nl1.api.radio-browser.info/json/stations/search?limit=200&hidebroken=true&order=clickcount&reverse=true&country=Russia');
+
+  // Fetch radio stations data for America
+  this.fetchRadioStations('https://nl1.api.radio-browser.info/json/stations/search?limit=200&hidebroken=true&order=clickcount&reverse=true&country=United States');
+
+  // Fetch radio stations data for South America
+  this.fetchRadioStations('https://nl1.api.radio-browser.info/json/stations/search?limit=200&hidebroken=true&order=clickcount&reverse=true&country=South America');
+
+  // Fetch radio stations data for France
+  this.fetchRadioStations('https://nl1.api.radio-browser.info/json/stations/search?limit=200&hidebroken=true&order=clickcount&reverse=true&country=France');
+
+  // Fetch radio stations data for Germany
+  this.fetchRadioStations('https://nl1.api.radio-browser.info/json/stations/search?limit=200&hidebroken=true&order=clickcount&reverse=true&country=Germany');
+
+  this.fetchRadioStations('https://nl1.api.radio-browser.info/json/stations/search?limit=200&hidebroken=true&order=clickcount&reverse=true&country=Italy');
+
+    // Fetch radio stations data for Africa
+    this.fetchRadioStations('https://nl1.api.radio-browser.info/json/stations/search?limit=200&hidebroken=true&order=clickcount&reverse=true&continent=Africa');
+    
+  window.addEventListener('resize', this.handleWindowResize);
+
+  // Initialize the video player
+  this.videoPlayer = document.createElement('video');
+  this.videoPlayer.style.display = 'none'; // Hide the video player
+  document.body.appendChild(this.videoPlayer); // Append the video player to the body
+},
+
   
     beforeUnmount() {
       window.removeEventListener('resize', this.handleWindowResize);
@@ -183,7 +198,7 @@
             const y = this.earthRadius * Math.cos(phi);
             const z = this.earthRadius * Math.sin(phi) * Math.sin(theta);
   
-            const geometry = new THREE.SphereGeometry(0.025, 2, 2);
+            const geometry = new THREE.SphereGeometry(0.010, 0, 0);
             const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
             const marker = new THREE.Mesh(geometry, material);
             marker.position.set(x, y, z);
