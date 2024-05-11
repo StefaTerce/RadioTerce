@@ -9,10 +9,13 @@
                 <v-card :color="randomColor()">
                   <div class="d-flex flex-column align-center justify-center">
                     <v-avatar class="ma-3" rounded="0" size="125">
-                      <v-img v-if="radio.isPlaying" :src="require('@/assets/audio-8777_256.gif')"></v-img>
-                      <v-img width="100" height="120" v-else-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
-                      <v-icon v-else>mdi-radio</v-icon>
+                      <a :href="radio.websiteUrl" target="_blank"> <!-- Add this line -->
+                        <v-img v-if="radio.isPlaying" :src="require('@/assets/audio-8777_256.gif')"></v-img>
+                        <v-img width="130" height="120" v-else-if="radio.imageUrl" :src="radio.imageUrl"></v-img>
+                        <v-icon v-else>mdi-radio</v-icon>
+                      </a> <!-- Close the anchor tag here -->
                     </v-avatar>
+
                     <div class="text-center">
                       <v-card-title class="text-subtitle-2">{{ radio.name }}</v-card-title>
                       <v-card-subtitle class="text-caption">{{ radio.artist }}</v-card-subtitle>
@@ -107,13 +110,13 @@ export default {
       this.saveToLocalStorage();
     },
     saveToLocalStorage() {
-    // Mappa tutte le radio impostando isPlaying a false prima di salvarle
-    const radiosToSave = this.radios.map(radio => ({
-      ...radio,
-      isPlaying: false // Assicura che isPlaying sia sempre false quando salvi nel localStorage
-    }));
-    localStorage.setItem('radios', JSON.stringify(radiosToSave));
-  }
+      // Mappa tutte le radio impostando isPlaying a false prima di salvarle
+      const radiosToSave = this.radios.map(radio => ({
+        ...radio,
+        isPlaying: false // Assicura che isPlaying sia sempre false quando salvi nel localStorage
+      }));
+      localStorage.setItem('radios', JSON.stringify(radiosToSave));
+    }
   },
   created() {
     this.getRadios();
@@ -125,6 +128,7 @@ export default {
 .ma-3 {
   margin-top: 10px;
 }
+
 .text-center {
   text-align: center;
 }
