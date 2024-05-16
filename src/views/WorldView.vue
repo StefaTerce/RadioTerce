@@ -221,7 +221,7 @@ export default {
     requestAnimationFrame(this.animate);
 
     // Aggiorna la rotazione automatica del globo
-    this.scene.rotation.y += 0.008; // Modifica il valore per regolare la velocità di rotazione
+    this.scene.rotation.y += 0.0005; // Modifica il valore per regolare la velocità di rotazione
 
     // Aggiorna i controlli solo se c'è interazione dell'utente
     if (this.controls) {
